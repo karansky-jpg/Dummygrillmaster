@@ -1,0 +1,894 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRILL MASTERS | TASTE AND HEALTH WRAPPED TOGETHER</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cormorant Garamond for luxury serif, Montserrat for modern sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Montserrat"', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    /* Premium scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333333;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555555;
+    }
+
+    /* Custom classes for randomized dynamic popups on scroll */
+    .scroll-reveal {
+      opacity: 0;
+      transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
+    }
+
+    /* Initial state directions */
+    .reveal-left {
+      transform: translateX(-80px);
+    }
+    .reveal-right {
+      transform: translateX(80px);
+    }
+    .reveal-down {
+      transform: translateY(80px);
+    }
+
+    /* Active State */
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translate(0, 0) !important;
+    }
+
+    /* Custom glowing shadow for luxury 3:4 modal */
+    .luxury-glow {
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.08), 
+                  0 0 100px rgba(255, 255, 255, 0.03),
+                  inset 0 0 20px rgba(255, 255, 255, 0.05);
+    }
+
+    /* Elegant continuous pulse */
+    @keyframes pulse-light {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.4; }
+    }
+    .pulse-text {
+      animation: pulse-light 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-black text-white font-sans overflow-x-hidden relative min-h-screen">
+
+  <!-- BACKGROUND WATERMARK LOGOS (Absolutely Positioned & Non-overlaying) -->
+  <div id="bg-watermarks-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <!-- Will be dynamically injected via JavaScript to spread gracefully across the long page -->
+  </div>
+
+  <!-- SPECIAL OFFER TEMPORARY MODAL WINDOW (3:4 Aspect Ratio) -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-opacity duration-500">
+    <!-- Confetti & Sparkles Canvas -->
+    <canvas id="effects-canvas" class="absolute inset-0 pointer-events-none z-10"></canvas>
+    
+    <!-- Modal Window (3:4 ratio constrained on desktop and mobile) -->
+    <div id="modal-window" class="relative z-20 w-full max-w-[340px] aspect-[3/4] bg-zinc-950/90 border border-white/20 rounded-2xl luxury-glow flex flex-col justify-between p-8 text-center transition-all duration-500 scale-95 opacity-0">
+      
+      <!-- Close Button Guide -->
+      <button id="close-modal-btn" class="absolute top-4 right-4 text-white/40 hover:text-white transition-colors duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Top Accent -->
+      <div class="flex justify-center items-center space-x-2 pt-4">
+        <span class="h-[1px] w-6 bg-white/20"></span>
+        <p class="text-[10px] uppercase tracking-[0.3em] text-zinc-400 font-light">EXCLUSIVE INVITATION</p>
+        <span class="h-[1px] w-6 bg-white/20"></span>
+      </div>
+
+      <!-- Main Actionable Text (The Special Offer Box) -->
+      <div id="offer-text-container" class="my-auto cursor-pointer group select-none py-6">
+        <h2 id="offer-heading" class="text-4xl font-serif font-light tracking-widest text-white transition-all duration-300 group-hover:scale-105 group-hover:text-zinc-300">
+          SPECIAL <br>OFFER
+        </h2>
+        <div id="tap-hint" class="mt-4 text-[10px] uppercase tracking-[0.2em] text-zinc-500 pulse-text transition-all duration-300">
+          [ Tap To Open ]
+        </div>
+      </div>
+
+      <!-- Bottom Branding / Close Help Hint -->
+      <div class="pb-2">
+        <p class="text-[10px] text-zinc-500 tracking-wider">
+          Tap anywhere outside to continue
+        </p>
+        <div class="mt-3 flex justify-center">
+          <span class="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
+          <span class="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
+          <span class="w-1 h-1 rounded-full bg-white/40 mx-1"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN WEBSITE WRAPPER (Z-INDEX 10 to float above background watermarks) -->
+  <div class="relative z-10 w-full flex flex-col items-center">
+
+    <!-- 1. CREATED BY KARAN DIGITAL MENU AGENCY (Top Bar) -->
+    <div class="w-full bg-zinc-950 border-b border-white/10 py-3 text-center px-4 relative z-20">
+      <p class="text-[10px] uppercase tracking-[0.3em] font-light text-zinc-400">
+        Created By <span class="text-white font-normal hover:text-zinc-300 transition-all duration-300">Karan Digital Menu Agency</span>
+      </p>
+    </div>
+
+    <!-- MAIN HEADER & HERO SECTION -->
+    <header class="w-full max-w-7xl mx-auto px-6 pt-16 pb-12 flex flex-col items-center text-center relative z-20">
+      
+      <!-- 2. MAIN LOGO -->
+      <div class="scroll-reveal max-w-[280px] md:max-w-[320px] mb-6 rounded-full overflow-hidden border border-white/10 p-2 bg-black/60 backdrop-blur-sm shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+        <img 
+          src="https://i.ibb.co/bgndD7hK/Screenshot-20260518-144001-Chrome.jpg" 
+          alt="Grill Masters Luxury Logo" 
+          class="w-full h-auto object-cover rounded-full filter contrast-125"
+          onerror="this.src='https://via.placeholder.com/300?text=Grill+Masters';"
+        />
+      </div>
+
+      <!-- TAG LINE BELOW LOGO -->
+      <div class="scroll-reveal mt-2">
+        <p class="text-sm md:text-base uppercase tracking-[0.4em] font-light text-zinc-300 font-serif italic">
+          Taste and Health Wrapped Together
+        </p>
+        <div class="w-12 h-[1px] bg-white/30 mx-auto mt-4"></div>
+      </div>
+    </header>
+
+    <!-- STORY / ABOUT US SECTION -->
+    <section class="w-full max-w-4xl mx-auto px-6 py-12 md:py-20 relative z-10">
+      <div class="border border-white/10 bg-zinc-950/40 backdrop-blur-md p-8 md:p-16 rounded-3xl relative overflow-hidden">
+        <!-- Accent lines -->
+        <div class="absolute top-0 left-12 w-[1px] h-8 bg-white/20"></div>
+        <div class="absolute bottom-0 right-12 w-[1px] h-8 bg-white/20"></div>
+
+        <h3 class="scroll-reveal text-center font-serif text-3xl md:text-4xl font-light tracking-widest mb-10 text-white">
+          THE LEGACY
+        </h3>
+
+        <!-- Multi-part editorial layout for the restaurant story -->
+        <div class="space-y-8 text-zinc-300 font-light leading-relaxed text-sm md:text-base tracking-wide">
+          <p class="scroll-reveal text-center italic text-white text-base md:text-lg font-serif">
+            "Grill Masters started its first outlet in August, 2015 in Yamunanagar (Haryana)."
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+            <p class="scroll-reveal text-justify">
+              The Promoters came from different backgrounds but shared a similar passion. Customers loved our menu and gave us a huge success. After testing our products in the market, we developed a franchise model. Our franchise model was simple to apply at different locations and gave opportunities to people to work and earn with us.
+            </p>
+            <p class="scroll-reveal text-justify">
+              Grill Masters originally came up with a premier quick service restaurant and later, we also started our dine-in cafes. We offer one of the fastest growing franchise opportunities for the 21st Century. We have a complete fast food restaurant concept tailored to suit qualified investors and investment groups.
+            </p>
+          </div>
+
+          <p class="scroll-reveal text-center font-serif text-white text-lg md:text-xl py-4 border-y border-white/5 my-6">
+            Life is better together, and everyone is happy when they're with family.
+          </p>
+
+          <p class="scroll-reveal text-justify">
+            We treat everyone who walks through our doors like an essential part of our family, sharing palatable food with the people we love, and spending the time together. Grill Masters provides fresh food items, hearty portions, good service, fair prices and a multi-choice menu, all of which add up to good value for money for customers, and generates brand loyalty as well.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE MENU SECTION -->
+    <section class="w-full max-w-4xl mx-auto px-6 py-12 md:py-20 relative z-10">
+      
+      <!-- Section Title -->
+      <div class="text-center mb-16">
+        <p class="scroll-reveal text-[10px] uppercase tracking-[0.4em] text-zinc-500 mb-2">GASTRONOMIC SELECTION</p>
+        <h2 class="scroll-reveal font-serif text-4xl md:text-5xl font-light tracking-widest text-white">
+          VEG SECTION
+        </h2>
+        <div class="w-16 h-[1px] bg-white/20 mx-auto mt-6"></div>
+      </div>
+
+      <!-- Accordion Menu Categories -->
+      <div class="space-y-6">
+
+        <!-- i. VEG PIZZA SECTION -->
+        <div class="scroll-reveal border border-white/10 rounded-2xl overflow-hidden bg-zinc-950/40 backdrop-blur-sm transition-all duration-300 hover:border-white/20">
+          <button 
+            onclick="toggleAccordion('pizza-accordion', 'pizza-arrow')"
+            class="w-full px-8 py-6 flex justify-between items-center text-left focus:outline-none group"
+          >
+            <div>
+              <span class="text-xs uppercase tracking-widest text-zinc-500 block mb-1">Authentic Stone-Baked</span>
+              <h3 class="font-serif text-xl md:text-2xl font-light tracking-wider text-white group-hover:text-zinc-300 transition-colors duration-200">
+                VEG PIZZA
+              </h3>
+            </div>
+            <span class="p-2 rounded-full border border-white/15 group-hover:border-white/30 transition-all duration-300">
+              <svg id="pizza-arrow" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-500 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+
+          <!-- Dropdown Inner Content -->
+          <div id="pizza-accordion" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+            <div class="px-8 pb-8 pt-2 border-t border-white/5 bg-black/40">
+              <!-- Grid Header -->
+              <div class="grid grid-cols-12 gap-2 pb-4 mb-6 border-b border-white/10 text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+                <div class="col-span-8 md:col-span-9">Pizza Selection</div>
+                <div class="col-span-2 md:col-span-1.5 text-center">Regular (R)</div>
+                <div class="col-span-2 md:col-span-1.5 text-center">Medium (M)</div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="space-y-6">
+                <!-- Row Item -->
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Cheese Margherita</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Premium classic cheese with rich house tomato base</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹170</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹310</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Veggie Garden</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Crisp orchard-fresh vegetables, herbs, mozzarella</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹130</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹310</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Sweet Corn Treat</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Golden sweet corn kernels balanced with loaded melting cheese</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹170</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹310</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Mushroom Feast</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Earth-grown button mushrooms sauteed with aromatic herbs</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹200</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹330</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Bingo</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Cottage cheese chunks tossed in dynamic spices with capsicum</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹200</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹330</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Tikka</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Clay-oven char-grilled smokey paneer marinated in tikka base</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹240</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹390</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Punjabi Paneer Pizza</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Authentic rich North Indian spices paired with tender paneer cubes</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹240</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹390</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-8 md:col-span-9 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Garden Special Pizza</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">The signature masterwork loaded with all classic field toppings</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹240</div>
+                  <div class="col-span-2 md:col-span-1.5 text-center font-light text-zinc-300 text-sm">₹390</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ii. VEG BURGER SECTION -->
+        <div class="scroll-reveal border border-white/10 rounded-2xl overflow-hidden bg-zinc-950/40 backdrop-blur-sm transition-all duration-300 hover:border-white/20">
+          <button 
+            onclick="toggleAccordion('burger-accordion', 'burger-arrow')"
+            class="w-full px-8 py-6 flex justify-between items-center text-left focus:outline-none group"
+          >
+            <div>
+              <span class="text-xs uppercase tracking-widest text-zinc-500 block mb-1">Gourmet Crafted Buns</span>
+              <h3 class="font-serif text-xl md:text-2xl font-light tracking-wider text-white group-hover:text-zinc-300 transition-colors duration-200">
+                VEG BURGER
+              </h3>
+            </div>
+            <span class="p-2 rounded-full border border-white/15 group-hover:border-white/30 transition-all duration-300">
+              <svg id="burger-arrow" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-500 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+
+          <!-- Dropdown Inner Content -->
+          <div id="burger-accordion" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+            <div class="px-8 pb-8 pt-2 border-t border-white/5 bg-black/40">
+              <!-- Grid Header -->
+              <div class="grid grid-cols-12 gap-2 pb-4 mb-6 border-b border-white/10 text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+                <div class="col-span-7 md:col-span-8">Burger Selection</div>
+                <div class="col-span-2 md:col-span-2 text-center">Regular</div>
+                <div class="col-span-3 md:col-span-2 text-center">Whole Wheat</div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="space-y-6">
+                <!-- Row Item -->
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Junior</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Perfect size crisp veggie patty with fresh house sauce</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹60</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹70</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">TEXAS</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Robust smokey BBQ seasonings with crunch & onions</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹80</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹90</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Creamy Burger</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Smooth, luxurious cream mayo layer over golden base</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹80</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹90</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Chana Patty Burger</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Traditional spiced chickpea patty with sharp tangy sauce</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹80</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹90</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">American Burger</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Classic relish, sliced gherkins, double sweet onion & tomato</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹90</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹100</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Crisp</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Crumbed deep fried cottage cheese block, fresh lettuce</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹100</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹110</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Giga Bite</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Double tiered dynamic vegetable patties with extra melt</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹110</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹120</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Texas Paneer</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Texas style seasoned cottage cheese block with smokey spice</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹110</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹120</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Makhani Burger</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Mouthwatering luxury butter sauce infused paneer block</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹120</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹130</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Veg Mountain</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Our tallest premium creation loaded with vegetables and paneer layers</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹160</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- iii. VEG WRAPS SECTION -->
+        <div class="scroll-reveal border border-white/10 rounded-2xl overflow-hidden bg-zinc-950/40 backdrop-blur-sm transition-all duration-300 hover:border-white/20">
+          <button 
+            onclick="toggleAccordion('wraps-accordion', 'wraps-arrow')"
+            class="w-full px-8 py-6 flex justify-between items-center text-left focus:outline-none group"
+          >
+            <div>
+              <span class="text-xs uppercase tracking-widest text-zinc-500 block mb-1">Delicate Rolled Tortillas</span>
+              <h3 class="font-serif text-xl md:text-2xl font-light tracking-wider text-white group-hover:text-zinc-300 transition-colors duration-200">
+                VEG WRAPS
+              </h3>
+            </div>
+            <span class="p-2 rounded-full border border-white/15 group-hover:border-white/30 transition-all duration-300">
+              <svg id="wraps-arrow" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform transition-transform duration-500 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+
+          <!-- Dropdown Inner Content -->
+          <div id="wraps-accordion" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+            <div class="px-8 pb-8 pt-2 border-t border-white/5 bg-black/40">
+              <!-- Grid Header -->
+              <div class="grid grid-cols-12 gap-2 pb-4 mb-6 border-b border-white/10 text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+                <div class="col-span-7 md:col-span-8">Wrap Selection</div>
+                <div class="col-span-2 md:col-span-2 text-center">Regular</div>
+                <div class="col-span-3 md:col-span-2 text-center">Whole Wheat</div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="space-y-6">
+                <!-- Row Item -->
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Veg Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Crisp garden greens, seasoned vegetables, light spread</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹110</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹130</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Chana Patty Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Aromatic chickpea croquettes with crisp onions & relish</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹120</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹130</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Mexican Tortilla</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Southwest seasoned fillings, sweet corn, salsa drizzle</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹130</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹140</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Hara Bhara Kebab Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Spinach, green pea & potato kebabs rolled in gourmet format</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹140</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Crunchy Paneer Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Crusted high protein paneer wrap with luxury textures</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹140</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Grilled Paneer Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Exquisite flame-grilled paneer slices wrapped gracefully</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹160</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Peri Peri Paneer Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Intense peri-peri spice dust sprinkled on juicy grilled paneer</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹160</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-2 items-center group">
+                  <div class="col-span-7 md:col-span-8 pr-4">
+                    <h4 class="font-serif text-base md:text-lg text-white group-hover:text-zinc-300 transition-colors duration-200">Paneer Makhani Wrap</h4>
+                    <p class="text-xs text-zinc-500 font-light mt-0.5">Our signature rich butter tomato cream paneer wrap</p>
+                  </div>
+                  <div class="col-span-2 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹150</div>
+                  <div class="col-span-3 md:col-span-2 text-center font-light text-zinc-300 text-sm">₹160</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER SECTION -->
+    <footer class="w-full bg-zinc-950 border-t border-white/5 py-12 px-6 mt-16 text-center relative z-20">
+      <div class="max-w-4xl mx-auto flex flex-col items-center">
+        <!-- Logo Icon Miniature -->
+        <p class="font-serif text-2xl tracking-[0.3em] text-white">GRILL MASTERS</p>
+        <p class="text-[9px] uppercase tracking-[0.5em] text-zinc-500 mt-2">Yamunanagar, Haryana (Est. 2015)</p>
+        
+        <div class="w-16 h-[1px] bg-white/10 my-6"></div>
+        
+        <!-- Interactive message and luxury design credit -->
+        <p class="text-xs text-zinc-400 font-light tracking-wide max-w-md">
+          Indulging tastebuds with state-of-the-art fast food and dine-in cafe elegance. Discover premium franchise prospects around India.
+        </p>
+
+        <p class="text-[9px] text-zinc-600 mt-10 tracking-[0.2em] uppercase">
+          &copy; 2026 Grill Masters. All Rights Reserved. Crafted for Haute Dining.
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // --- ACCORDION STATE CONTROLLER ---
+    function toggleAccordion(id, arrowId) {
+      const accordion = document.getElementById(id);
+      const arrow = document.getElementById(arrowId);
+      
+      if (accordion.style.maxHeight && accordion.style.maxHeight !== '0px') {
+        accordion.style.maxHeight = '0px';
+        arrow.style.transform = 'rotate(0deg)';
+      } else {
+        // Automatically close other open accordions for luxury seamless feel
+        const allAccordions = ['pizza-accordion', 'burger-accordion', 'wraps-accordion'];
+        const allArrows = ['pizza-arrow', 'burger-arrow', 'wraps-arrow'];
+        
+        allAccordions.forEach((accId, index) => {
+          if (accId !== id) {
+            document.getElementById(accId).style.maxHeight = '0px';
+            document.getElementById(allArrows[index]).style.transform = 'rotate(0deg)';
+          }
+        });
+
+        // Open the clicked one
+        accordion.style.maxHeight = accordion.scrollHeight + 'px';
+        arrow.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // --- RANDOMIZED EVERY-SCROLL POPUP EVENT LISTENER ---
+    // This script attaches a direction to all reveal elements, and resets it when scrolled out of bounds
+    const revealElements = document.querySelectorAll('.scroll-reveal');
+    const directions = ['reveal-left', 'reveal-right', 'reveal-down'];
+
+    // Randomize initial direction of each scroll element on load
+    revealElements.forEach(el => {
+      const randomDir = directions[Math.floor(Math.random() * directions.length)];
+      el.classList.add(randomDir);
+    });
+
+    function checkReveal() {
+      const triggerBottom = window.innerHeight * 0.92;
+      const triggerTop = window.innerHeight * 0.08;
+
+      revealElements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        
+        // Is it inside the visible screen window?
+        if (rect.top < triggerBottom && rect.bottom > triggerTop) {
+          if (!el.classList.contains('visible')) {
+            el.classList.add('visible');
+          }
+        } else {
+          // Reset when scrolled fully out of view (allowing multi-scrolling pop up animations)
+          if (el.classList.contains('visible')) {
+            el.classList.remove('visible');
+            
+            // Clean up old direction classes
+            directions.forEach(dir => el.classList.remove(dir));
+            
+            // Assign a fresh random direction for its next entry popup!
+            const newRandomDir = directions[Math.floor(Math.random() * directions.length)];
+            el.classList.add(newRandomDir);
+          }
+        }
+      });
+    }
+
+    // Bind scroll and load events
+    window.addEventListener('scroll', checkReveal);
+    window.addEventListener('load', checkReveal);
+
+
+    // --- WATERMARK BG LOGO INJECTION ---
+    // Places background logo watermarks randomly without text overlay issues (pointer-events-none, low opacity, z-0)
+    function injectWatermarks() {
+      const container = document.getElementById('bg-watermarks-container');
+      const docHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+      const numberOfWatermarks = 6;
+      
+      for (let i = 0; i < numberOfWatermarks; i++) {
+        const img = document.createElement('img');
+        img.src = 'https://i.ibb.co/84bMbV7S/Screenshot-20260429-174505-Gallery.jpg';
+        img.alt = 'Grill Masters Logo Background';
+        img.className = 'absolute w-[180px] md:w-[260px] opacity-[0.035] pointer-events-none mix-blend-screen select-none filter grayscale contrast-120';
+        
+        // Randomly scatter them along the total document height
+        const topPercent = (i / numberOfWatermarks) * 85 + 5 + (Math.random() * 8); // Spread sequentially with random offset
+        const leftPercent = Math.random() > 0.5 ? Math.random() * 15 : 75 + (Math.random() * 10); // Keep them close to the outer flanks to avoid text
+        
+        img.style.top = `${topPercent}%`;
+        img.style.left = `${leftPercent}%`;
+        img.style.transform = `rotate(${Math.floor(Math.random() * 360)}deg)`;
+        
+        // Fallback for watermark loading
+        img.onerror = function() { this.style.display = 'none'; };
+
+        container.appendChild(img);
+      }
+    }
+    injectWatermarks();
+
+
+    // --- CANVAS EFFECTS: GENTLE FALLING SPARKLES & TWIN PARTY POPPERS ---
+    const canvas = document.getElementById('effects-canvas');
+    const ctx = canvas.getContext('2d');
+    let animationId;
+    let particles = [];
+    let isModalActive = true;
+
+    // Set canvas dimensions
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Sparkle {
+      constructor() {
+        this.reset();
+        // Give some initial spread
+        this.y = Math.random() * canvas.height;
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = -10;
+        this.size = Math.random() * 2 + 1;
+        this.speedY = Math.random() * 1.5 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.5 + 0.5;
+        this.fadeSpeed = Math.random() * 0.015 + 0.005;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.opacity -= this.fadeSpeed;
+        if (this.opacity <= 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'white';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class PopperParticle {
+      constructor(x, y, angle) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle + (Math.random() - 0.5) * 0.4;
+        this.speed = Math.random() * 12 + 6;
+        this.vx = Math.cos(this.angle) * this.speed;
+        this.vy = Math.sin(this.angle) * this.speed;
+        this.size = Math.random() * 4 + 2;
+        this.gravity = 0.22;
+        this.friction = 0.96;
+        this.opacity = 1.0;
+        this.decay = Math.random() * 0.02 + 0.01;
+        // High luxury monochromatic sparkles, silver and golden white
+        this.color = Math.random() > 0.5 ? '#ffffff' : '#d4d4d8';
+      }
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.opacity -= this.decay;
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        // Star shape or diamond shape for popper particle
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Initialize regular falling sparkles
+    const sparklesCount = 65;
+    for (let i = 0; i < sparklesCount; i++) {
+      particles.push(new Sparkle());
+    }
+
+    // Trigger twin corner poppers shooting towards center
+    function launchPoppers() {
+      const modalRect = document.getElementById('modal-window').getBoundingClientRect();
+      const mLeftX = modalRect.left;
+      const mRightX = modalRect.right;
+      const mBottomY = modalRect.bottom;
+
+      // Shooter 1: Bottom-Left shooting up-right
+      for (let i = 0; i < 40; i++) {
+        particles.push(new PopperParticle(mLeftX, mBottomY, -Math.PI / 4));
+      }
+      // Shooter 2: Bottom-Right shooting up-left
+      for (let i = 0; i < 40; i++) {
+        particles.push(new PopperParticle(mRightX, mBottomY, -Math.PI * 3 / 4));
+      }
+    }
+
+    function animateEffects() {
+      if (!isModalActive) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p, idx) => {
+        p.update();
+        p.draw();
+        
+        // Remove dead popper particles
+        if (p instanceof PopperParticle && p.opacity <= 0) {
+          particles.splice(idx, 1);
+        }
+      });
+
+      animationId = requestAnimationFrame(animateEffects);
+    }
+
+
+    // --- MODAL CONTROLLER & INTERACTIVITY SETUP ---
+    window.addEventListener('DOMContentLoaded', () => {
+      const backdrop = document.getElementById('modal-backdrop');
+      const modal = document.getElementById('modal-window');
+      const offerContainer = document.getElementById('offer-text-container');
+      const offerHeading = document.getElementById('offer-heading');
+      const tapHint = document.getElementById('tap-hint');
+      const closeBtn = document.getElementById('close-modal-btn');
+
+      // Trigger reveal animations inside the modal on load
+      setTimeout(() => {
+        modal.classList.remove('scale-95', 'opacity-0');
+        modal.classList.add('scale-100', 'opacity-100');
+        // Initialize particle canvas loop and fire party popper
+        animateEffects();
+        launchPoppers();
+      }, 300);
+
+      // Handle Promo Clicks
+      let isFirstPromoActive = true;
+      offerContainer.addEventListener('click', (e) => {
+        e.stopPropagation(); // Avoid triggering backdrop close click
+        if (isFirstPromoActive) {
+          // Fade text out
+          offerHeading.style.opacity = 0;
+          tapHint.style.opacity = 0;
+          
+          setTimeout(() => {
+            // Unveil the "Nothing for Today" cheeky luxury response
+            offerHeading.innerHTML = "NOTHING<br>FOR TODAY!";
+            tapHint.textContent = "TRY TOMORROW";
+            tapHint.style.animation = 'none'; // Stop pulse
+            tapHint.classList.remove('text-zinc-500');
+            tapHint.classList.add('text-zinc-400', 'font-serif', 'italic', 'text-xs', 'tracking-[0.1em]');
+            
+            // Fade back in
+            offerHeading.style.opacity = 1;
+            tapHint.style.opacity = 1;
+
+            // Trigger another quick mini burst of party poppers for tactile feedback
+            launchPoppers();
+          }, 300);
+          isFirstPromoActive = false;
+        }
+      });
+
+      // Function to elegantly close modal window
+      function closeModal() {
+        isModalActive = false;
+        cancelAnimationFrame(animationId);
+        backdrop.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+          backdrop.remove();
+          // Ensure first scroll check happens correctly after modal finishes disappearing
+          checkReveal();
+        }, 500);
+      }
+
+      // Close modal on close icon click
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeModal();
+      });
+
+      // Close modal on clicking backdrop outside of modal window
+      backdrop.addEventListener('click', (e) => {
+        if (!modal.contains(e.target)) {
+          closeModal();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+```
